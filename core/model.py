@@ -8,10 +8,15 @@ import math
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-from torch.utils.checkpoint import checkpoint
 from typing import Optional, Tuple, List
 
 from .config import ModelConfig
+
+try:
+    from core.accelerator import supports_gradient_checkpointing
+except ImportError:
+    def supports_gradient_checkpointing() -> bool:  # type: ignore[misc]
+        return True
 
 class RMSNorm(nn.Module):
     """Root Mean Square Layer Normalization."""
@@ -171,14 +176,25 @@ class SpaceaxModel(nn.Module):
             mask = torch.full((1, 1, seqlen, seqlen), float("-inf"), device=tokens.device)
             mask = torch.triu(mask, diagonal=start_pos + 1).type_as(h)
 
+        use_gc = (
+            self.training
+            and h.requires_grad
+            and getattr(self.config, "use_gradient_checkpointing", False)
+            and supports_gradient_checkpointing()
+        )
+
         new_kv_caches = []
         for i, layer in enumerate(self.layers):
             cache = kv_caches[i] if kv_caches else None
-            if self.training and h.requires_grad and getattr(self.config, "use_gradient_checkpointing", False):
-                # Membantu mengurangi memory usage saat training (trade compute for memory)
+            if use_gc:
+                from torch.utils.checkpoint import checkpoint
+
                 def custom_forward(*inputs):
                     return layer(*inputs)
-                h, new_cache = checkpoint(custom_forward, h, freqs_cis, mask, cache, use_reentrant=False)
+
+                h, new_cache = checkpoint(
+                    custom_forward, h, freqs_cis, mask, cache, use_reentrant=False
+                )
             else:
                 h, new_cache = layer(h, freqs_cis, mask, cache)
             new_kv_caches.append(new_cache)

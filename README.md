@@ -771,6 +771,13 @@ Manual (setara):
    ```
 4. **torch / torch_xla tidak selaras** — di Colab gunakan `requirements-colab-tpu.txt`, bukan pin `torch<2.7`.
 
+### `AttributeError: module 'torch' has no attribute 'xla'`
+
+Terjadi saat **gradient checkpointing** aktif di TPU. Versi terbaru mematikan checkpoint otomatis di backend xla (hemat memori lewat bf16 + Adafactor).
+
+Jika masih muncul setelah `git pull`, pastikan log training menampilkan:
+`TPU v5e: gradient checkpointing dimatikan`.
+
 ### Training lambat di TPU tapi tidak error
 
 - Epoch pertama mengompilasi graph XLA (normal, bisa 5–15 menit).

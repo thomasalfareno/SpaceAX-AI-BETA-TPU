@@ -239,6 +239,14 @@ def use_native_bf16_training() -> bool:
     return get_backend() in ("tpu", "cuda") and supports_bfloat16()
 
 
+def supports_gradient_checkpointing() -> bool:
+    """
+    torch.utils.checkpoint memanggil torch.xla untuk device xla — tidak tersedia di PyTorch standar.
+    Di TPU v5e, hemat memori lewat bf16 + batch kecil + Adafactor.
+    """
+    return get_backend() != "tpu"
+
+
 def diagnose_hardware() -> bool:
     """
     Cetak status RAM + TPU/CUDA. Returns True jika akselerator siap training.

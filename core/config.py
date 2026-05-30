@@ -16,6 +16,7 @@ from core.accelerator import (
     get_backend,
     accelerator_label,
     is_accelerator_available,
+    supports_gradient_checkpointing,
 )
 
 configure_runtime()
@@ -366,6 +367,13 @@ def get_config(auto_detect: bool = True, size_override: str = None, force: bool 
         model_cfg = ModelConfig()
         training_cfg = TrainingConfig()
         profile_name = size_override or "medium"
+
+    if auto_detect and model_cfg.use_gradient_checkpointing and not supports_gradient_checkpointing():
+        model_cfg.use_gradient_checkpointing = False
+        print(
+            "   ⚡ TPU v5e: gradient checkpointing dimatikan "
+            "(torch.utils.checkpoint tidak mendukung device xla)."
+        )
 
     return {
         "model": model_cfg,
