@@ -2,7 +2,7 @@
 
 Mesin percakapan bahasa Indonesia berbasis Transformer decoder-only, dilatih dari nol di mesin sendiri (bukan model siap pakai dari HuggingFace). Dibangun Thomas Alfareno Ananta Nugraha — Teknik Informatika FTEIC ITS Surabaya, untuk Space Ax Corp.
 
-**Repositori:** [github.com/thomasalfareno/SpaceAX-AI-BETA](https://github.com/thomasalfareno/SpaceAX-AI-BETA)  
+**Repositori:** [github.com/thomasalfareno/SpaceAX-AI-BETA-TPU](https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU)  
 **Versi:** 2.0.0
 
 ---
