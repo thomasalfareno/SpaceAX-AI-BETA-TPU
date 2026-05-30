@@ -1,0 +1,20 @@
+# =============================================================================
+# Google Colab + Runtime TPU v5e-1
+#
+# Colab sudah memasang torch (mis. 2.9.x). JANGAN turunkan torch ke 2.6.
+# Hanya tambah dependensi aplikasi + torch_xla dari index libtpu.
+#
+# Di notebook:
+#   import os
+#   os.environ["PJRT_DEVICE"] = "TPU"
+#   os.environ["SPACEAX_ACCELERATOR"] = "tpu"
+#   !pip install -q -r requirements-colab-tpu.txt
+#   !python main.py verify-tpu
+# =============================================================================
+
+-r requirements.txt
+
+--extra-index-url https://storage.googleapis.com/libtpu-releases/index.html
+
+# Selaraskan dengan torch Colab (2.8+ / 2.9+). Pip akan memilih wheel cocok.
+torch_xla[tpu]>=2.8.0,<2.10.0

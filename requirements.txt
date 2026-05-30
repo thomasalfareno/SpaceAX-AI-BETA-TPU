@@ -1,12 +1,12 @@
 # =============================================================================
-# SpaceAx AI — dependensi inti (CPU / CUDA / TPU)
-# Training ProMax di TPU v5e-1: setelah baris ini, pasang requirements-tpu.txt
-#   bash scripts/install_tpu.sh
+# SpaceAx AI — dependensi aplikasi (tanpa PyTorch)
+#
+# PyTorch:
+#   • TPU v5e-1 (Colab/GCE): pip install -r requirements-colab-tpu.txt
+#                            atau bash scripts/install_tpu.sh
+#   • GPU/CPU lokal:         pip install -r requirements-torch.txt
+#                            lalu pip install -r requirements.txt
 # =============================================================================
-
-# Python disarankan: 3.10, 3.11, atau 3.12 (runtime Colab TPU umumnya 3.10–3.11)
-# PyTorch: versi stabil; untuk TPU, torch_xla di requirements-tpu.txt harus selaras
-torch>=2.2.0,<2.7.0
 
 numpy>=1.24.0,<3.0.0
 requests>=2.31.0,<3.0.0
@@ -17,6 +17,5 @@ rich>=13.7.0,<15.0.0
 ddgs>=9.14.0,<10.0.0
 duckduckgo-search>=5.0.0,<8.0.0
 
-# Tokenizer BPE (binding Python HuggingFace)
-#git+https://github.com/huggingface/tokenizers.git#subdirectory=bindings/python
-tokenizers
+# Tokenizer BPE (PyPI — hindari git clone di Colab)
+tokenizers>=0.19.0,<0.24.0

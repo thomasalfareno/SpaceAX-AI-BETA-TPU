@@ -294,7 +294,8 @@ def run_tpu_self_test(verbose: bool = True) -> bool:
         if verbose:
             print("❌ torch_xla tidak terpasang.")
             print("   Jalankan: bash scripts/install_tpu.sh")
-            print("   atau: pip install -r requirements-tpu.txt")
+            print("   Colab: pip install -r requirements-colab-tpu.txt")
+            print("   GCE:   pip install -r requirements-tpu.txt")
         return False
 
     if not is_tpu_available():
@@ -352,7 +353,8 @@ def ensure_tpu_ready(exit_on_fail: bool = True) -> bool:
         print(
             "\n❌ SPACEAX_ACCELERATOR=tpu tetapi TPU tidak aktif.\n"
             "   1. Runtime Colab: Runtime → Ubah jenis runtime → TPU v5e-1\n"
-            "   2. pip install -r requirements-tpu.txt\n"
+            "   2. Colab: pip install -r requirements-colab-tpu.txt\n"
+            "      GCE:  pip install -r requirements-tpu.txt\n"
             "   3. python main.py verify-tpu\n",
             file=sys.stderr,
         )

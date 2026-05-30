@@ -38,8 +38,8 @@ cd SpaceAX-AI-BETA-TPU
 Alur kerja biasa:
 
 1. Clone repo → **ekstrak `kbbi/ekstrak.zip` sekali** (isi JSON KBBI + leksikon txt).
-2. **Training (disarankan):** runtime **TPU v5e-1** + `pip install -r requirements-tpu.txt` → `python main.py verify-tpu` → `python main.py train`.
-3. **Lokal / GPU:** `pip install -r requirements.txt` → `python main.py train`.
+2. **Training (disarankan):** runtime **TPU v5e-1** + `pip install -r requirements-colab-tpu.txt` (Colab) → `python main.py verify-tpu` → `python main.py train`.
+3. **Lokal / GPU:** `pip install -r requirements.txt -r requirements-torch.txt` → `python main.py train`.
 4. `python main.py chat` — ngobrol; model mencoba generate teks sendiri dulu, baru fallback jika output tidak layak.
 5. (Opsional) `python main.py retrain` — gabung log chat ke dataset lalu latih ulang.
 
@@ -111,11 +111,14 @@ Setelah menambah file KBBI baru, hapus checkpoint & vocab lama lalu `--regen` (u
 SpaceAX-AI-BETA-TPU/            # nama folder setelah git clone
 ├── main.py                 # CLI: train, chat, learn, retrain, test, chatdev
 ├── chat.py                 # UI terminal + generasi + fallback percakapan
-├── requirements.txt        # Dependensi inti (semua platform)
-├── requirements-tpu.txt    # Tambahan torch_xla untuk TPU v5e-1
+├── requirements.txt            # Paket aplikasi (tanpa torch)
+├── requirements-torch.txt      # PyTorch CPU/CUDA (lokal)
+├── requirements-colab-tpu.txt  # Colab TPU — jangan turunkan torch
+├── requirements-tpu.txt        # GCE / TPU VM
 ├── scripts/
-│   ├── install_tpu.sh      # Instal otomatis TPU (Colab/GCE)
-│   └── verify_tpu.py       # Tes PyTorch/XLA
+│   ├── install_colab_tpu.py    # Instal Colab (disarankan)
+│   ├── install_tpu.sh          # Instal TPU (deteksi Colab otomatis)
+│   └── verify_tpu.py           # Tes PyTorch/XLA
 ├── core/
 │   ├── accelerator.py      # TPU / CUDA / CPU — device, mark_step, diagnostik
 │   ├── config.py           # Profil model (small→promax), training, deteksi RAM/HBM
@@ -181,28 +184,30 @@ SpaceAX-AI-BETA-TPU/            # nama folder setelah git clone
 | Jaringan | Opsional | Untuk `learn` / `ddgs` |
 
 - Setelah ekstrak `kbbi/ekstrak.zip`: `kbbi_v_part1.json` … `part4.json` + file txt leksikon.
-- File dependensi: `requirements.txt` (wajib), `requirements-tpu.txt` (wajib jika training di TPU).
+- File dependensi: lihat tabel di bawah (pilih sesuai lingkungan).
 
-### Isi `requirements.txt` (inti)
+### File requirements
 
-| Paket | Fungsi |
-|-------|--------|
-| `torch` | Model & training |
-| `numpy` | Tensor / numerik |
-| `tokenizers` | BPE tokenizer |
-| `ddgs` / `duckduckgo-search` | Pencarian internet |
-| `rich` | UI terminal chat |
-| `requests`, `beautifulsoup4` | HTTP / parsing web |
+| File | Kapan dipakai |
+|------|----------------|
+| `requirements.txt` | Selalu — numpy, tokenizers, ddgs, rich, … (**tanpa** torch) |
+| `requirements-torch.txt` | PC lokal / server **GPU atau CPU** |
+| `requirements-colab-tpu.txt` | **Google Colab + runtime TPU v5e-1** |
+| `requirements-tpu.txt` | **GCE / TPU VM** (bukan Colab) |
 
-### Isi `requirements-tpu.txt` (tambahan TPU)
+| Paket (requirements.txt) | Fungsi |
+|--------------------------|--------|
+| `numpy`, `tokenizers` | Data & BPE |
+| `ddgs`, `rich`, `requests`, `beautifulsoup4` | Chat & web |
 
-| Paket | Fungsi |
-|-------|--------|
-| `-r requirements.txt` | Semua dependensi inti |
-| `torch_xla[tpu]` | Backend PyTorch/XLA untuk TPU v5e |
+| Paket (TPU) | Fungsi |
+|-------------|--------|
+| `torch_xla[tpu]>=2.8.0` | PyTorch/XLA (index libtpu; **bukan** `<2.6`) |
 | Index `libtpu-releases` | Wheel resmi Google |
 
-Instalasi satu perintah: `bash scripts/install_tpu.sh`
+**Colab:** jangan `pip install torch` dari pin lama — runtime sudah punya torch 2.9.x; memaksa 2.6 memecah `torch_xla`.
+
+Instalasi: `python scripts/install_colab_tpu.py` atau `!pip install -r requirements-colab-tpu.txt`
 
 ### Training di TPU v5e-1 (disarankan)
 
@@ -253,11 +258,11 @@ Remove-Item kbbi\ekstrak.zip
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install -U pip
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-torch.txt
 pip install "ddgs>=9.14.0"
 ```
 
-5. PyTorch + CUDA (jika ada NVIDIA): ikuti perintah di [pytorch.org](https://pytorch.org/get-started/locally/) sesuai driver Anda.
+5. PyTorch + CUDA (jika ada NVIDIA): ganti `requirements-torch.txt` dengan wheel CUDA dari [pytorch.org](https://pytorch.org/get-started/locally/) jika perlu.
 
 6. Cek:
 
@@ -281,7 +286,7 @@ rm -rf kbbi/temp kbbi/ekstrak.zip
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-torch.txt
 pip install "ddgs>=9.14.0"
 ```
 
@@ -322,16 +327,17 @@ main.py train
 export PJRT_DEVICE=TPU
 export SPACEAX_ACCELERATOR=tpu
 
-# 2) Dari root repo
-bash scripts/install_tpu.sh
-# atau manual:
-pip install -U pip
+# 2) Colab (disarankan)
+python scripts/install_colab_tpu.py
+# atau:
+pip install -r requirements-colab-tpu.txt
+
+# 2b) GCE / TPU VM (bukan Colab)
 pip install -r requirements.txt
 pip install -r requirements-tpu.txt
 
 # 3) Verifikasi
 python main.py verify-tpu
-# keluaran harus: ✅ TPU siap untuk: python main.py train ...
 ```
 
 ### Training ProMax di TPU v5e-1
@@ -356,15 +362,14 @@ python main.py train --size promax --promax-tier promax_8b --epochs 30 --force -
 
 | Lingkungan | Python | PyTorch | torch_xla |
 |------------|--------|---------|-----------|
-| Colab TPU v5e (2024–2026) | 3.10–3.11 | 2.4.x–2.5.x | Pasang dari `requirements-tpu.txt` |
-| GCE TPU VM | 3.10–3.11 | Selaras dengan image TPU | `pip install -r requirements-tpu.txt` |
+| Colab TPU v5e (2025–2026) | 3.11–3.12 | **2.9.x** (bawaan Colab) | `requirements-colab-tpu.txt` → torch_xla **2.8+** |
+| GCE TPU VM | 3.10–3.11 | Selaras image | `requirements-tpu.txt` |
 
-Jika `pip` gagal mencocokkan versi, pasang torch dulu lalu torch_xla dari index Google:
+**Jangan** memasang `torch<2.7` di Colab — error umum:
 
-```bash
-pip install "torch>=2.2.0,<2.7.0"
-pip install -r requirements-tpu.txt
-```
+`No matching distribution found for torch_xla<2.6.0`
+
+Gunakan `requirements-colab-tpu.txt` (tanpa pin torch lama).
 
 ### Google Cloud Engine (ringkas)
 
@@ -400,10 +405,11 @@ os.environ["SPACEAX_ACCELERATOR"] = "tpu"
 !mv kbbi/temp/* kbbi/
 !rm -rf kbbi/temp kbbi/ekstrak.zip
 
-# 3) Dependensi TPU
+# 3) Dependensi TPU (JANGAN pip install -r requirements-tpu.txt di Colab)
 !pip install -q -U pip
-!pip install -q -r requirements.txt
-!pip install -q -r requirements-tpu.txt
+!pip install -q -r requirements-colab-tpu.txt
+# atau satu langkah:
+# !python scripts/install_colab_tpu.py
 
 # 4) Verifikasi TPU
 !python main.py verify-tpu
@@ -531,7 +537,7 @@ python main.py train
 python main.py verify-tpu
 ```
 
-Menjalankan tes alokasi tensor, matmul bfloat16, `nn.Linear`, dan `mark_step()`. Jalankan setelah `pip install -r requirements-tpu.txt` dan runtime TPU aktif.
+Menjalankan tes alokasi tensor, matmul bfloat16, `nn.Linear`, dan `mark_step()`. Colab: setelah `requirements-colab-tpu.txt`. GCE: setelah `requirements-tpu.txt`.
 
 **Contoh**
 
@@ -718,13 +724,33 @@ File yang dimuat chat: `data/checkpoints/model_best.pt`.
 
 ## Masalah umum
 
+### `No matching distribution found for torch_xla<2.6.0`
+
+Penyebab: `requirements-tpu.txt` versi lama atau `pip install -r requirements.txt` yang memaksa **torch 2.6** di Colab (padahal index libtpu hanya punya **torch_xla 2.8+**).
+
+**Perbaikan di Colab (runtime TPU v5e-1):**
+
+```python
+import os
+os.environ["PJRT_DEVICE"] = "TPU"
+os.environ["SPACEAX_ACCELERATOR"] = "tpu"
+
+# Pulihkan torch Colab + pasang xla (jangan turunkan ke 2.6)
+!pip install -q -U "torch>=2.8.0" \
+  --extra-index-url https://storage.googleapis.com/libtpu-releases/index.html
+!pip install -q -r requirements-colab-tpu.txt
+
+!python main.py verify-tpu
+```
+
+Jika masih bentrok: **Runtime → Restart session** → ulangi hanya sel di atas (jangan `pip install -r requirements-tpu.txt`).
+
 ### TPU tidak terdeteksi / `verify-tpu` gagal
 
 1. **Runtime salah** — Colab harus **TPU v5e-1**, bukan GPU atau CPU. Restart runtime setelah ganti.
-2. **`torch_xla` belum terpasang:**
+2. **`torch_xla` belum terpasang (Colab):**
    ```bash
-   pip install -r requirements.txt
-   pip install -r requirements-tpu.txt
+   pip install -r requirements-colab-tpu.txt
    ```
 3. **`PJRT_DEVICE`:** harus `TPU` sebelum import torch_xla:
    ```bash
@@ -732,11 +758,7 @@ File yang dimuat chat: `data/checkpoints/model_best.pt`.
    export SPACEAX_ACCELERATOR=tpu
    python main.py verify-tpu
    ```
-4. **Versi PyTorch vs torch_xla tidak cocok** — pasang ulang berurutan:
-   ```bash
-   pip install "torch>=2.2.0,<2.7.0"
-   pip install -r requirements-tpu.txt
-   ```
+4. **torch / torch_xla tidak selaras** — di Colab gunakan `requirements-colab-tpu.txt`, bukan pin `torch<2.7`.
 
 ### Training lambat di TPU tapi tidak error
 

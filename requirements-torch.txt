@@ -1,0 +1,7 @@
+# =============================================================================
+# PyTorch untuk training/inferensi di CPU atau CUDA (bukan TPU)
+# Pasang SETELAH atau BERSAMA requirements.txt:
+#   pip install -r requirements.txt -r requirements-torch.txt
+# =============================================================================
+
+torch>=2.2.0,<2.7.0

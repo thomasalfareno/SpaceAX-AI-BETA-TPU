@@ -11,10 +11,16 @@ export SPACEAX_ACCELERATOR="${SPACEAX_ACCELERATOR:-tpu}"
 echo "==> SpaceAx AI — instalasi TPU (PJRT_DEVICE=$PJRT_DEVICE)"
 python3 -m pip install -U pip wheel
 
-echo "==> Dependensi inti"
+if [ -n "${COLAB_RELEASE_TAG:-}" ]; then
+  echo "==> Colab terdeteksi — memakai requirements-colab-tpu.txt (tanpa downgrade torch)"
+  python3 scripts/install_colab_tpu.py
+  exit $?
+fi
+
+echo "==> Dependensi aplikasi"
 python3 -m pip install -r requirements.txt
 
-echo "==> PyTorch/XLA (torch_xla) — harus cocok dengan versi torch"
+echo "==> PyTorch/XLA (GCE / TPU VM)"
 python3 -m pip install -r requirements-tpu.txt
 
 echo "==> Verifikasi TPU"

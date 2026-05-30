@@ -1,21 +1,17 @@
 # =============================================================================
-# SpaceAx AI — tambahan TPU v5e-1 (Google Colab / Cloud TPU / GCE)
+# SpaceAx AI — TPU v5e-1 (Google Cloud TPU VM / lingkungan non-Colab)
 #
-# Prasyarat:
-#   1. Runtime TPU aktif (Colab: Runtime → Ubah jenis runtime → TPU v5e-1)
-#   2. Sudah: pip install -r requirements.txt
-#   3. Lalu: pip install -r requirements-tpu.txt
-#      atau: bash scripts/install_tpu.sh
+# JANGAN pakai file ini di Google Colab — gunakan requirements-colab-tpu.txt
+# (Colab sudah menyediakan torch; memaksa torch 2.6 memecah torch_xla 2.9)
 #
-# Dokumentasi lengkap: README.md → bagian "TPU v5e-1"
+# Urutan:
+#   pip install -r requirements.txt
+#   pip install -r requirements-tpu.txt
 # =============================================================================
 
 -r requirements.txt
 
-# PyTorch/XLA — pasang SETELAH torch dari requirements.txt
-# Index resmi libtpu (Google); versi minor disesuaikan otomatis jika perlu
 --extra-index-url https://storage.googleapis.com/libtpu-releases/index.html
-torch_xla[tpu]>=2.4.0,<2.6.0
 
-# Opsional: percepat compile XLA (Colab sering sudah menyediakan libtpu di image)
-# libtpu — biasanya ditarik sebagai dependensi torch_xla[tpu]
+# Versi di index libtpu (2025–2026): 2.8.x, 2.9.x — JANGAN batasi <2.6
+torch_xla[tpu]>=2.8.0,<2.10.0
