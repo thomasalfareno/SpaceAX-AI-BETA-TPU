@@ -18,4 +18,5 @@ ddgs>=9.14.0,<10.0.0
 duckduckgo-search>=5.0.0,<8.0.0
 
 # Tokenizer BPE (binding Python HuggingFace)
-git+https://github.com/huggingface/tokenizers.git#subdirectory=bindings/python
+#git+https://github.com/huggingface/tokenizers.git#subdirectory=bindings/python
+tokenizers
