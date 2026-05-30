@@ -31,8 +31,8 @@ Mesin percakapan bahasa Indonesia berbasis Transformer decoder-only, dilatih dar
 Clone proyek:
 
 ```bash
-git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-cd SpaceAX-AI-BETA
+git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+cd SpaceAX-AI-BETA-TPU
 ```
 
 Alur kerja biasa:
@@ -108,7 +108,7 @@ Setelah menambah file KBBI baru, hapus checkpoint & vocab lama lalu `--regen` (u
 ## Struktur folder & modul
 
 ```
-SpaceAX-AI-BETA/            # nama folder setelah git clone
+SpaceAX-AI-BETA-TPU/            # nama folder setelah git clone
 ├── main.py                 # CLI: train, chat, learn, retrain, test, chatdev
 ├── chat.py                 # UI terminal + generasi + fallback percakapan
 ├── requirements.txt        # Dependensi inti (semua platform)
@@ -234,8 +234,8 @@ Instalasi satu perintah: `bash scripts/install_tpu.sh`
 2. Buka Command Prompt atau PowerShell, masuk ke folder proyek:
 
 ```cmd
-git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-cd SpaceAX-AI-BETA
+git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+cd SpaceAX-AI-BETA-TPU
 ```
 
 3. Ekstrak KBBI (sekali):
@@ -270,8 +270,8 @@ python -c "from ddgs import DDGS; import torch; print('ok', torch.__version__)"
 ## Instalasi Linux
 
 ```bash
-git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-cd SpaceAX-AI-BETA
+git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+cd SpaceAX-AI-BETA-TPU
 
 # Ekstrak KBBI (wajib sekali)
 unzip -q kbbi/ekstrak.zip -d kbbi/temp
@@ -392,8 +392,8 @@ os.environ["PJRT_DEVICE"] = "TPU"
 os.environ["SPACEAX_ACCELERATOR"] = "tpu"
 
 # 1) Clone
-!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-%cd SpaceAX-AI-BETA
+!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+%cd SpaceAX-AI-BETA-TPU
 
 # 2) Ekstrak KBBI (wajib sekali)
 !unzip -q kbbi/ekstrak.zip -d kbbi/temp
@@ -443,8 +443,8 @@ from google.colab import drive
 drive.mount('/content/drive')
 
 # 2) Clone repo
-!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-%cd SpaceAX-AI-BETA
+!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+%cd SpaceAX-AI-BETA-TPU
 
 # 3) Ekstrak KBBI (wajib sekali — dari kbbi/ekstrak.zip di repo)
 !unzip -q kbbi/ekstrak.zip -d kbbi/temp
@@ -479,8 +479,8 @@ Simpan checkpoint ke Drive:
 **Jangan** di runtime T4 (15 GB VRAM) — akan macet/OOM di `Inisialisasi Model`. Pilih *Runtime → A100*.
 
 ```python
-!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA.git
-%cd SpaceAX-AI-BETA
+!git clone https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU.git
+%cd SpaceAX-AI-BETA-TPU
 
 !unzip -q kbbi/ekstrak.zip -d kbbi/temp
 !mv kbbi/temp/* kbbi/
@@ -825,4 +825,4 @@ Hapus `data/checkpoints/*` dan latih ulang, atau `--regen` jika vocab berubah.
 Teknik Informatika — FTEIC — ITS Surabaya  
 Space Ax Corp — SpaceAx AI  
 
-GitHub: [thomasalfareno/SpaceAX-AI-BETA](https://github.com/thomasalfareno/SpaceAX-AI-BETA)
+GitHub: [thomasalfareno/SpaceAX-AI-BETA-TPU](https://github.com/thomasalfareno/SpaceAX-AI-BETA-TPU)
