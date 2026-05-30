@@ -33,12 +33,17 @@ _tpu_chip_count: Optional[int] = None
 
 _xla = None
 _xm = None
+_xla_import_error: Optional[str] = None
 _backend: Optional[Backend] = None
 _device: Optional[torch.device] = None
 
 
-def _load_xla():
-    global _xla, _xm
+def get_xla_import_error() -> Optional[str]:
+    return _xla_import_error
+
+
+def _load_xla(*, verbose: bool = False) -> bool:
+    global _xla, _xm, _xla_import_error
     if _xm is not None:
         return True
     try:
@@ -46,8 +51,17 @@ def _load_xla():
         import torch_xla.core.xla_model as xm
 
         _xm = xm
+        _xla_import_error = None
         return True
-    except Exception:
+    except Exception as e:
+        _xla_import_error = f"{type(e).__name__}: {e}"
+        if verbose:
+            print(f"      import torch_xla gagal: {_xla_import_error}")
+            print(f"      torch saat ini: {torch.__version__}")
+            print(
+                "      → Colab: python scripts/install_colab_tpu.py "
+                "(lalu Restart session jika torch masih 2.6+cu)"
+            )
         return False
 
 
@@ -290,11 +304,15 @@ def run_tpu_self_test(verbose: bool = True) -> bool:
             print("❌ SPACEAX_ACCELERATOR=cpu — lewati tes TPU.")
         return False
 
-    if not _load_xla():
+    if not _load_xla(verbose=verbose):
         if verbose:
-            print("❌ torch_xla tidak terpasang.")
-            print("   Jalankan: bash scripts/install_tpu.sh")
-            print("   Colab: pip install -r requirements-colab-tpu.txt")
+            print("❌ torch_xla tidak bisa di-import (belum terpasang atau tidak cocok dengan torch).")
+            err = get_xla_import_error()
+            if err:
+                print(f"   Detail: {err}")
+            print(f"   torch={torch.__version__}")
+            print("   Colab: !python scripts/install_colab_tpu.py")
+            print("          lalu Runtime → Restart session → verify-tpu lagi")
             print("   GCE:   pip install -r requirements-tpu.txt")
         return False
 

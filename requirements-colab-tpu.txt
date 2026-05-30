@@ -16,5 +16,6 @@
 
 --extra-index-url https://storage.googleapis.com/libtpu-releases/index.html
 
-# Selaraskan dengan torch Colab (2.8+ / 2.9+). Pip akan memilih wheel cocok.
-torch_xla[tpu]>=2.8.0,<2.10.0
+# WAJIB pasang berpasangan dari index libtpu (bukan torch 2.6+cu124 dari sesi GPU lama)
+torch==2.9.0
+torch_xla[tpu]==2.9.0

@@ -730,20 +730,31 @@ Penyebab: `requirements-tpu.txt` versi lama atau `pip install -r requirements.tx
 
 **Perbaikan di Colab (runtime TPU v5e-1):**
 
+`torch_xla` terpasang di pip tetapi `import` gagal jika **torch masih 2.6+cu124** (sisa runtime GPU) sementara **torch_xla 2.9** butuh **torch 2.9** dari index libtpu.
+
 ```python
 import os
 os.environ["PJRT_DEVICE"] = "TPU"
 os.environ["SPACEAX_ACCELERATOR"] = "tpu"
 
-# Pulihkan torch Colab + pasang xla (jangan turunkan ke 2.6)
-!pip install -q -U "torch>=2.8.0" \
-  --extra-index-url https://storage.googleapis.com/libtpu-releases/index.html
-!pip install -q -r requirements-colab-tpu.txt
+%cd SpaceAX-AI-BETA-TPU   # folder yang berisi main.py
 
-!python main.py verify-tpu
+# Pasang ulang torch+xla berpasangan + verifikasi di proses baru
+!python scripts/install_colab_tpu.py
 ```
 
-Jika masih bentrok: **Runtime → Restart session** → ulangi hanya sel di atas (jangan `pip install -r requirements-tpu.txt`).
+Jika verify masih gagal: **Runtime → Restart session** (tetap TPU v5e-1) → jalankan ulang **hanya** sel `install_colab_tpu.py` di atas.
+
+Manual (setara):
+
+```python
+!pip install -q -U --force-reinstall \
+  --extra-index-url https://storage.googleapis.com/libtpu-releases/index.html \
+  "torch==2.9.0" "torch_xla[tpu]==2.9.0"
+!pip install -q -r requirements.txt
+# Restart session, lalu:
+!python main.py verify-tpu
+```
 
 ### TPU tidak terdeteksi / `verify-tpu` gagal
 
